@@ -8,7 +8,14 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { DataTable } from "@/components/ui/data-table";
 import { DataTableColumnHeader } from "@/components/ui/data-table-column-header";
-import { Eye, MoreHorizontal, Mail, Copy, Trash2 } from "lucide-react";
+import {
+  Eye,
+  MoreHorizontal,
+  Mail,
+  Copy,
+  Trash2,
+  ShieldCheck,
+} from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -30,6 +37,7 @@ import {
   useDeleteEmployee,
 } from "@/lib/hooks/useEmployees";
 import type { Employee } from "@/lib/types/employee";
+import { toast } from "sonner";
 
 interface EmployeeTableProps {
   employees: Employee[];
@@ -40,7 +48,9 @@ export function EmployeeTable({ employees, isLoading }: EmployeeTableProps) {
   const router = useRouter();
   const sendInvite = useSendEmployeeInvite();
   const deleteEmployee = useDeleteEmployee();
-  const [employeeToDelete, setEmployeeToDelete] = useState<Employee | null>(null);
+  const [employeeToDelete, setEmployeeToDelete] = useState<Employee | null>(
+    null
+  );
 
   const columns: ColumnDef<Employee>[] = [
     {
@@ -66,7 +76,21 @@ export function EmployeeTable({ employees, isLoading }: EmployeeTableProps) {
         <DataTableColumnHeader column={column} title="Email" />
       ),
       cell: ({ row }) => {
-        return <div className="lowercase">{row.getValue("email")}</div>;
+        return (
+          <div className="lowercase flex items-center justify-between gap-4">
+            {row.getValue("email")}{" "}
+            <Button
+              variant="link"
+              className="p-0"
+              onClick={() => {
+                navigator.clipboard.writeText(row.getValue("email"));
+                toast.success("Email copied");
+              }}
+            >
+              <Copy className="mr-2 h-4 w-4" />
+            </Button>
+          </div>
+        );
       },
       enableSorting: true,
     },
@@ -150,10 +174,12 @@ export function EmployeeTable({ employees, isLoading }: EmployeeTableProps) {
                 View details
               </DropdownMenuItem>
               <DropdownMenuItem
-                onClick={() => navigator.clipboard.writeText(employee.email)}
+                onClick={() =>
+                  router.push(`/dashboard/employees/${employee.id}/compliance`)
+                }
               >
-                <Copy className="mr-2 h-4 w-4" />
-                Copy email
+                <ShieldCheck className="mr-2 h-4 w-4" />
+                View Compliance
               </DropdownMenuItem>
               {!employee.hasUser && (
                 <DropdownMenuItem
@@ -188,7 +214,7 @@ export function EmployeeTable({ employees, isLoading }: EmployeeTableProps) {
         onError: () => {
           // Error is already handled by the hook with toast
           setEmployeeToDelete(null);
-        }
+        },
       });
     }
   };
@@ -200,9 +226,9 @@ export function EmployeeTable({ employees, isLoading }: EmployeeTableProps) {
   return (
     <>
       <DataTable columns={columns} data={employees} searchKey="email" />
-      
-      <AlertDialog 
-        open={!!employeeToDelete} 
+
+      <AlertDialog
+        open={!!employeeToDelete}
         onOpenChange={() => setEmployeeToDelete(null)}
       >
         <AlertDialogContent>
@@ -213,7 +239,8 @@ export function EmployeeTable({ employees, isLoading }: EmployeeTableProps) {
               <span className="font-semibold">
                 {employeeToDelete?.firstName} {employeeToDelete?.lastName}
               </span>
-              ? This action cannot be undone and will permanently remove their record from the system.
+              ? This action cannot be undone and will permanently remove their
+              record from the system.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

@@ -15,6 +15,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Bell,
+  FolderOpen,
 } from "lucide-react";
 import { authApi } from "@/lib/api/auth";
 
@@ -28,6 +29,11 @@ const navigation = [
     name: "Employees",
     href: "/dashboard/employees",
     icon: Users,
+  },
+  {
+    name: "Documents",
+    href: "/dashboard/documents",
+    icon: FolderOpen,
   },
   {
     name: "Notifications",

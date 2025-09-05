@@ -1,7 +1,10 @@
 "use client";
 
 import { useParams, useRouter } from "next/navigation";
-import { useEmployeeDetails, useSendEmployeeInvite } from "@/lib/hooks/useEmployees";
+import {
+  useEmployeeDetails,
+  useSendEmployeeInvite,
+} from "@/lib/hooks/useEmployees";
 import {
   Card,
   CardContent,
@@ -22,6 +25,7 @@ import {
   UserCheck,
   Loader2,
 } from "lucide-react";
+import Link from "next/link";
 
 export default function EmployeeDetailsPage() {
   const params = useParams();
@@ -37,7 +41,7 @@ export default function EmployeeDetailsPage() {
 
   if (error || !employee) {
     return (
-      <div className="container mx-auto py-6">
+      <div className="p-6">
         <Card className="max-w-2xl mx-auto">
           <CardContent className="pt-6">
             <div className="text-center space-y-4">
@@ -62,20 +66,21 @@ export default function EmployeeDetailsPage() {
   };
 
   const formatAddress = () => {
-    const parts = [employee.address, employee.city, employee.state, employee.country].filter(Boolean);
+    const parts = [
+      employee.address,
+      employee.city,
+      employee.state,
+      employee.country,
+    ].filter(Boolean);
     return parts.length > 0 ? parts.join(", ") : "Not provided";
   };
 
   return (
-    <div className="container mx-auto py-6 space-y-6">
-      <Button
-        variant="ghost"
-        onClick={() => router.push("/dashboard/employees")}
-        className="mb-4"
-      >
+    <div className="p-6 space-y-6">
+      <Link href="/dashboard/employees" className="flex items-center gap-x-4">
         <ArrowLeft className="h-4 w-4" />
         Back to Employees
-      </Button>
+      </Link>
 
       <div className="grid gap-6 md:grid-cols-3">
         <div className="md:col-span-2 space-y-6">
@@ -152,9 +157,19 @@ export default function EmployeeDetailsPage() {
           </Card>
 
           {!employee.hasUser && (
-            <Card className={sendInvite.isSuccess ? "bg-green-50 border-green-200" : "bg-amber-50 border-amber-200"}>
+            <Card
+              className={
+                sendInvite.isSuccess
+                  ? "bg-green-50 border-green-200"
+                  : "bg-amber-50 border-amber-200"
+              }
+            >
               <CardHeader>
-                <CardTitle className={`text-lg ${sendInvite.isSuccess ? "text-green-800" : "text-amber-800"}`}>
+                <CardTitle
+                  className={`text-lg ${
+                    sendInvite.isSuccess ? "text-green-800" : "text-amber-800"
+                  }`}
+                >
                   Account Status
                 </CardTitle>
               </CardHeader>
@@ -165,17 +180,18 @@ export default function EmployeeDetailsPage() {
                       ✓ Invitation sent successfully!
                     </p>
                     <p className="text-green-700 text-sm">
-                      An email has been sent to {employee.email} with instructions to create their account.
+                      An email has been sent to {employee.email} with
+                      instructions to create their account.
                     </p>
                   </div>
                 ) : (
                   <>
                     <p className="text-amber-700">
-                      This employee has not yet created their account. Send them an invitation
-                      email to complete the onboarding process.
+                      This employee has not yet created their account. Send them
+                      an invitation email to complete the onboarding process.
                     </p>
-                    <Button 
-                      className="mt-4" 
+                    <Button
+                      className="mt-4"
                       variant="default"
                       onClick={() => sendInvite.mutate({ id: employeeId })}
                       disabled={sendInvite.isPending}

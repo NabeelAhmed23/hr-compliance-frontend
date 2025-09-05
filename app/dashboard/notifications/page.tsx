@@ -2,12 +2,7 @@
 
 import React, { useState } from "react";
 import { Bell, Filter, RefreshCw, Check } from "lucide-react";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -20,8 +15,14 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { NotificationItem } from "@/components/notifications/NotificationItem";
 import { useNotificationContext } from "@/contexts/NotificationContext";
-import { useInfiniteNotifications, useNotificationActions } from "@/lib/hooks/useNotifications";
-import type { NotificationFilters, NotificationResponse } from "@/lib/types/notification";
+import {
+  useInfiniteNotifications,
+  useNotificationActions,
+} from "@/lib/hooks/useNotifications";
+import type {
+  NotificationFilters,
+  NotificationResponse,
+} from "@/lib/types/notification";
 
 export default function NotificationsPage() {
   const [typeFilter, setTypeFilter] = useState<NotificationFilters["type"]>();
@@ -43,7 +44,8 @@ export default function NotificationsPage() {
     limit: 20,
   });
 
-  const notifications = infiniteData?.pages.flatMap(page => page.data.notifications) || [];
+  const notifications =
+    infiniteData?.pages.flatMap((page) => page.data.notifications) || [];
   const hasUnread = unreadCount > 0;
 
   const handleMarkAllAsRead = async () => {
@@ -73,7 +75,7 @@ export default function NotificationsPage() {
   const hasFilters = typeFilter || readFilter !== undefined;
 
   return (
-    <div className="container mx-auto py-6 space-y-6">
+    <div className="p-6 space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="space-y-1">
@@ -87,11 +89,7 @@ export default function NotificationsPage() {
         </div>
 
         <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            onClick={handleRefresh}
-            className="gap-2"
-          >
+          <Button variant="outline" onClick={handleRefresh} className="gap-2">
             <RefreshCw className="h-4 w-4" />
             Refresh
           </Button>
@@ -133,8 +131,12 @@ export default function NotificationsPage() {
               <label className="text-sm font-medium">Type:</label>
               <Select
                 value={typeFilter || "all"}
-                onValueChange={(value) => 
-                  setTypeFilter(value === "all" ? undefined : value as NotificationResponse['type'])
+                onValueChange={(value) =>
+                  setTypeFilter(
+                    value === "all"
+                      ? undefined
+                      : (value as NotificationResponse["type"])
+                  )
                 }
               >
                 <SelectTrigger className="w-[140px]">
@@ -154,11 +156,20 @@ export default function NotificationsPage() {
             <div className="flex items-center gap-2">
               <label className="text-sm font-medium">Status:</label>
               <Select
-                value={readFilter === undefined ? "all" : readFilter ? "read" : "unread"}
-                onValueChange={(value) => 
+                value={
+                  readFilter === undefined
+                    ? "all"
+                    : readFilter
+                    ? "read"
+                    : "unread"
+                }
+                onValueChange={(value) =>
                   setReadFilter(
-                    value === "all" ? undefined : 
-                    value === "read" ? true : false
+                    value === "all"
+                      ? undefined
+                      : value === "read"
+                      ? true
+                      : false
                   )
                 }
               >
@@ -182,7 +193,8 @@ export default function NotificationsPage() {
           <CardTitle className="flex items-center justify-between">
             <span>Your Notifications</span>
             <Badge variant="secondary">
-              {notifications.length} notification{notifications.length !== 1 ? 's' : ''}
+              {notifications.length} notification
+              {notifications.length !== 1 ? "s" : ""}
             </Badge>
           </CardTitle>
         </CardHeader>
@@ -206,15 +218,20 @@ export default function NotificationsPage() {
           ) : notifications.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-center">
               <Bell className="h-16 w-16 text-muted-foreground/50 mb-4" />
-              <h3 className="text-lg font-semibold mb-2">No notifications found</h3>
+              <h3 className="text-lg font-semibold mb-2">
+                No notifications found
+              </h3>
               <p className="text-muted-foreground max-w-sm">
-                {hasFilters 
+                {hasFilters
                   ? "No notifications match your current filters. Try adjusting your search criteria."
-                  : "You're all caught up! New notifications will appear here."
-                }
+                  : "You're all caught up! New notifications will appear here."}
               </p>
               {hasFilters && (
-                <Button variant="outline" onClick={clearFilters} className="mt-4">
+                <Button
+                  variant="outline"
+                  onClick={clearFilters}
+                  className="mt-4"
+                >
                   Clear Filters
                 </Button>
               )}

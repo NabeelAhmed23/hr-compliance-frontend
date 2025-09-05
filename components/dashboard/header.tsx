@@ -2,10 +2,6 @@
 
 import {
   Search,
-  Grid3X3,
-  Settings,
-  Maximize,
-  Mail,
   ChevronLeft,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";

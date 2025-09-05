@@ -12,7 +12,6 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
-import { NotificationBell } from "./NotificationBell";
 import { NotificationItem } from "./NotificationItem";
 import { useNotificationContext } from "@/contexts/NotificationContext";
 import {
