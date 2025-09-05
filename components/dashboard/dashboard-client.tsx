@@ -20,16 +20,17 @@ import { Users, FileText, Shield, TrendingUp, AlertCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { format } from "date-fns";
 import { ComplianceEmployeeTable } from "@/components/employees/ComplianceEmployeeTable";
+import { User } from "@/lib/types/user";
+import { isHROrAdmin } from "@/lib/utils/permission";
 
 const statusColors = {
   GREEN: "bg-green-500",
   YELLOW: "bg-yellow-500",
   RED: "bg-red-500",
 };
-
-export default function DashboardPage() {
+function DashboardClient({ user }: { user: User }) {
   const router = useRouter();
-  const { data: complianceData, isLoading: complianceLoading } =
+  const { data: complianceOrgData, isLoading: complianceLoading } =
     useOrganizationCompliance({ includeMetrics: true });
   const { data: metricsData, isLoading: metricsLoading } =
     useComplianceMetrics();
@@ -37,6 +38,10 @@ export default function DashboardPage() {
     useCriticalIssues();
 
   const loading = complianceLoading || metricsLoading || criticalLoading;
+
+  const complianceData = !isHROrAdmin(user.role)
+    ? { data: { summary: metricsData?.data?.complianceSummary, employees: [] } }
+    : complianceOrgData;
 
   return (
     <div className="p-6">
@@ -56,10 +61,18 @@ export default function DashboardPage() {
         <Alert className="mb-6 border-red-500 bg-red-50">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
-            <strong>{criticalData.data.summary.totalExpiredDocuments}</strong>{" "}
-            expired documents across{" "}
-            <strong>{criticalData.data.summary.totalEmployees}</strong>{" "}
-            employees require immediate attention.
+            <p>
+              <strong>{criticalData.data.summary.totalExpiredDocuments}</strong>{" "}
+              expired{" "}
+              {criticalData.data.summary.totalExpiredDocuments > 1
+                ? "documents"
+                : "document"}{" "}
+              across <strong>{criticalData.data.summary.totalEmployees}</strong>{" "}
+              {criticalData.data.summary.totalEmployees > 1
+                ? "employees"
+                : "employee"}{" "}
+              require immediate attention.
+            </p>
           </AlertDescription>
         </Alert>
       ) : null}
@@ -67,25 +80,27 @@ export default function DashboardPage() {
       {/* Compliance Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         {/* Total Employees */}
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">
-                  Total Employees
-                </p>
-                {loading ? (
-                  <Skeleton className="h-8 w-20 mt-1" />
-                ) : (
-                  <p className="text-3xl font-bold text-gray-900">
-                    {metricsData?.data?.totalEmployees || 0}
+        {user && ["ADMIN", "HR", "SUPERADMIN"].includes(user?.role) && (
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600">
+                    Total Employees
                   </p>
-                )}
+                  {loading ? (
+                    <Skeleton className="h-8 w-20 mt-1" />
+                  ) : (
+                    <p className="text-3xl font-bold text-gray-900">
+                      {metricsData?.data?.totalEmployees || 0}
+                    </p>
+                  )}
+                </div>
+                <Users className="h-8 w-8 text-primary" />
               </div>
-              <Users className="h-8 w-8 text-primary" />
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Compliance Rate */}
         <Card>
@@ -177,29 +192,31 @@ export default function DashboardPage() {
       {/* Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Employee Compliance Table */}
-        <div className="lg:col-span-2">
-          <Card>
-            <CardHeader>
-              <CardTitle>Employee Compliance Status</CardTitle>
-              <CardDescription>
-                Overview of all employees and their compliance status
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {loading ? (
-                <div className="space-y-2">
-                  <Skeleton className="h-10 w-full" />
-                  <Skeleton className="h-10 w-full" />
-                  <Skeleton className="h-10 w-full" />
-                </div>
-              ) : (
-                <ComplianceEmployeeTable
-                  employees={complianceData?.data?.employees || []}
-                />
-              )}
-            </CardContent>
-          </Card>
-        </div>
+        {isHROrAdmin(user.role) && (
+          <div className="lg:col-span-2">
+            <Card>
+              <CardHeader>
+                <CardTitle>Employee Compliance Status</CardTitle>
+                <CardDescription>
+                  Overview of all employees and their compliance status
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {loading ? (
+                  <div className="space-y-2">
+                    <Skeleton className="h-10 w-full" />
+                    <Skeleton className="h-10 w-full" />
+                    <Skeleton className="h-10 w-full" />
+                  </div>
+                ) : (
+                  <ComplianceEmployeeTable
+                    employees={complianceData?.data?.employees || []}
+                  />
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        )}
 
         {/* Critical Issues */}
         <div>
@@ -235,10 +252,11 @@ export default function DashboardPage() {
                               {employee.name}
                             </p>
                             <p className="text-xs text-gray-600">
-                              {employee.totalExpiredDocuments} expired{" "}
-                              {employee.totalExpiredDocuments === 1
+                              {employee.expiredDocuments.length} expired{" "}
+                              {employee.expiredDocuments.length === 1
                                 ? "document"
-                                : "documents"}
+                                : "documents"}{" "}
+                              found
                             </p>
                           </div>
                           <Button
@@ -316,3 +334,5 @@ export default function DashboardPage() {
     </div>
   );
 }
+
+export default DashboardClient;

@@ -1,9 +1,6 @@
 "use client";
 
-import {
-  Search,
-  ChevronLeft,
-} from "lucide-react";
+import { Search, ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -27,11 +24,6 @@ export function Header({ user }: HeaderProps) {
     <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6">
       {/* Left side - Back button and Search */}
       <div className="flex items-center space-x-4 flex-1">
-        {/* Back button */}
-        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-          <ChevronLeft className="h-4 w-4 text-gray-600" />
-        </Button>
-
         {/* Search bar */}
         <div className="relative max-w-md w-full">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />

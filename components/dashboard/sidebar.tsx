@@ -86,7 +86,11 @@ export function Sidebar() {
       )}
     >
       {/* Logo and Toggle */}
-      <div className="flex h-20 items-center justify-between px-6 py-4">
+      <div
+        className={`flex h-20 items-center justify-between ${
+          isCollapsed ? "" : "px-6 py-4"
+        }`}
+      >
         <div className="flex items-center">
           <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary">
             <Building className="h-5 w-5 text-white flex-shrink-0" />
